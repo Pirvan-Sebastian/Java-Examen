@@ -1,5 +1,4 @@
 Cod,Denumire,Pret
-
 1,Stafide,6.03
 2,Seminte,21.18
 3,Ceai verde Lipton,10.70

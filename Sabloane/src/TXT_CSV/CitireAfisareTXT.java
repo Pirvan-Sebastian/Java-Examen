@@ -34,7 +34,7 @@ public class CitireAfisareTXT
             writer.println("Cod,Denumire,Pret\n");
             for(ObiectDefault obiectDefault : listaObiecte)
             {
-                writer.printf("%d,%s,%f",obiectDefault.cod,obiectDefault.nume,obiectDefault.pret);
+                writer.printf("%d,%s,%.2f",obiectDefault.cod,obiectDefault.nume,obiectDefault.pret);
                 writer.println();
             }
         }
