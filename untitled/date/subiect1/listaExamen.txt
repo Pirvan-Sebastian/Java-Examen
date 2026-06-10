@@ -1,0 +1,5 @@
+DenumireProdus,Numar Tranzactii
+Seminte de pin 300g,31
+Stafide 200g,12
+Crema de branza 300g,11
+Ceai verde Lipton,7

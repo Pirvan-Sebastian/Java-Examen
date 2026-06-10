@@ -1,0 +1,5 @@
+DenumireProdus,Pret
+Stafide 200g,6.030000
+Seminte de pin 300g,21.180000
+Crema de branza 300g,12.540000
+Ceai verde Lipton,10.700000
