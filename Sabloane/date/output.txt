@@ -1,0 +1,6 @@
+Cod,Denumire,Pret
+
+1,Stafide,6.030000
+2,Seminte,21.180000
+3,Ceai verde Lipton,10.700000
+4,Crema de branza 300g,12.540000
