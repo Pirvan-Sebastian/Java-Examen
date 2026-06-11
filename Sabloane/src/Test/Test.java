@@ -4,113 +4,78 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.UnknownHostException;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
+
 public class Test
 {
-    public static void main(String[] args) throws IOException,SQLException
+    public static void main(String[] args) throws InterruptedException {
+//        sandbox
+    Thread serverThread = new Thread(()->
     {
-        List<ObiectDefault> lista= new ArrayList<>();
-        //citire txt
-        try(BufferedReader bf=new BufferedReader(new FileReader("./date/intrare.txt")))
+        try(ServerSocket server=new ServerSocket(8080))
         {
-            String linie;
-            while((linie=bf.readLine())!=null)
+            int numarClienti=0;
+            while(numarClienti<3)
             {
-                String[] data= linie.split(",");
+                Socket socketClient= server.accept(); // mi a dat pachet(clientul)
 
-                ObiectDefault obiect= new ObiectDefault(
-                        Integer.parseInt(data[0]),
-                        data[1],
-                        Double.parseDouble(data[2])
-                );
+                Thread procesareCerere=new Thread(()->{
+                    try(Socket socket=socketClient;
+                    BufferedReader in=new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                    PrintWriter out=new PrintWriter(socket.getOutputStream(),true))
+                    {
+                        String cerere=in.readLine();
+                        //procesare
+                        String cerereProcesata=cerere+"-ADAOS SERVER";
 
-                lista.add(obiect);
+                        out.println(cerereProcesata);
+                    }
+                    catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+
+                procesareCerere.start();
+                numarClienti++;
             }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
+    });
 
-        //afisare txt
-        try(PrintWriter writer=new PrintWriter("./date/testout.txt"))
+    serverThread.start();
+    Thread.sleep(1000);
+
+    //client
+        for(int i=0;i<3;i++)
         {
-            writer.println("Cod,Nume,Pret");
-            for(ObiectDefault obj:lista)
-            {
-                writer.printf("%d,%s,%.2f\n",obj.getCod(),obj.getNume(),obj.getPret());
-            }
-        }
+            final int idClient=i;
 
-        //citire JSON
-        List<ObiectDefault> listaJSON = new ArrayList<>();
-        try(FileReader fisier=new FileReader("./date/input.json"))
-        {
-            JSONTokener tokener= new JSONTokener(fisier);
-            JSONArray array= new JSONArray(tokener);
+            Thread clientThread=new Thread(()->{
+                try(Socket socket=new Socket("localhost",8080);
+                BufferedReader in= new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                PrintWriter out= new PrintWriter(socket.getOutputStream(),true))
+                {
+                    String cerere="Cererea clientului "+idClient;
+                    out.println(cerere);
 
-            for(int i=0;i< array.length();i++)
-            {
-                JSONObject objJSON= array.getJSONObject(i);
+                    String raspuns=in.readLine();
+                    System.out.println(raspuns);
+                }
+                catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            });
 
-                listaJSON.add(new ObiectDefault(
-                        objJSON.getInt("codProdus"),
-                        objJSON.getString("nume"),
-                        objJSON.getDouble("pret")
-                ));
-            }
-        }
-        //afisare JSON
-        try(PrintWriter writer=new PrintWriter("./date/testout.json"))
-        {
-            JSONArray arrayJSON= new JSONArray();
-            for(ObiectDefault obj:listaJSON)
-            {
-                JSONObject obiectJSON = new JSONObject();
-
-                obiectJSON.put("codProdus",obj.getCod());
-                obiectJSON.put("nume",obj.getNume());
-                obiectJSON.put("pret",obj.getPret());
-
-                arrayJSON.put(obiectJSON);
-            }
-
-            writer.write(arrayJSON.toString());
-        }
-
-        //citire DB
-        List<ObiectDefaultDB> listaDB = new ArrayList<>();
-        String url="jdbc:sqlite:date/contacte.db";
-
-        try(Connection conn= DriverManager.getConnection(url);
-        Statement statement=conn.createStatement();
-        ResultSet result= statement.executeQuery("SELECT *FROM Contacte"))
-        {
-            while(result.next())
-            {
-                var cod=result.getInt(1);
-                var nume=result.getString(2);
-                var telefon=result.getLong(3);
-
-                listaDB.add(new ObiectDefaultDB(cod,nume,telefon));
-            }
-        }
-
-        //afiasre DB
-        try(Connection conn=DriverManager.getConnection(url);
-        PreparedStatement statement=conn.prepareStatement(
-                "INSERT INTO Contacte(Cod,NUme,Telefon) VALUES(?,?,?)"))
-        {
-            for(ObiectDefaultDB obj:listaDB)
-            {
-                statement.setInt(1,obj.getCod());
-                statement.setString(2,obj.getNume());
-                statement.setInt(3,(int)obj.getTelefon());
-
-                statement.executeUpdate();
-            }
+            clientThread.start();
         }
 
 
