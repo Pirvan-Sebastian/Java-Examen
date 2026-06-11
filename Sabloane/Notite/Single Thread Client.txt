@@ -1,0 +1,65 @@
+//Single Thread Client
+Thread clientThread = new Thread(() -> {
+    try (Socket socket = new Socket("localhost", 8080);
+         PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+         BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream())))
+    {
+        
+        System.out.println("[CLIENT] M-am conectat la server...");
+        
+        // 1. Trimitem cererea către server (ex: trimitem codul facultății)
+        String cerere = "1"; // pun ce trimite clinetul serverului ca si string ca sa citeasca cu in.ReadLine() ce primeste serverul
+        out.println(cerere);
+        System.out.println("[CLIENT] Am trimis cererea: " + cerere);
+
+        String raspuns = in.readLine();
+        System.out.println("[CLIENT] Am primit raspunsul: " + raspuns);
+        
+    }
+});
+
+//MULTI Thread Client
+//for ca sa am mai multi clienti
+for (int i = 1; i <= 3; i++)
+{
+    
+    // Variabila trebuie să fie final să o putem folosi în lambda
+    final int idClient = i; 
+    
+    Thread clientThread = new Thread(() -> {
+        try (Socket socket = new Socket("localhost", 8080);
+             PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()))) 
+	{
+             
+            System.out.println("[CLIENT " + idClient + "] M-am conectat la server...");
+            
+            String cerere = "Cererea_Numarul_" + idClient;
+            out.println(cerere);
+            System.out.println("[CLIENT " + idClient + "] Am trimis cererea...");
+            
+            String raspuns = in.readLine();
+            System.out.println("[CLIENT " + idClient + "] Am primit raspunsul: " + raspuns);
+            
+        }
+    });
+    
+    // NU UITA: Pornim fiecare thread de client imediat ce a fost creat!
+    clientThread.start(); 
+}
+
+//Legare
+
+   Thread serverThread = new Thread(() -> { ... }); //serverul aici
+    
+    // 2. Pui serverul să pornească primul
+    serverThread.start();
+    
+    // 3. Pui main-ul să "doarmă" jumătate de secundă ca să aibă timp serverul să deschidă portul 8080
+    Thread.sleep(500); 
+    
+    // 4. Aici pui codul lui clientThread (sau bucla for care face 3 clienți)
+    clientThread.start();  sau  for(int i=1; ...) { ... } //clinetul aici
+    
+    // 5. Opțional dar recomandat: Aștepți să termine serverul (dacă e din cel care se oprește)
+    serverThread.join();

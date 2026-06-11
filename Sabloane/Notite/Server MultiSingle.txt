@@ -1,0 +1,56 @@
+//SERVER SINGLE THREAD
+Thread serverThread = new Thread(() -> {
+    try (ServerSocket server = new ServerSocket(8080)) 
+    {
+        
+        System.out.println("[SERVER] Astept client...");
+        
+        try (Socket clientSocket = server.accept();
+             BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+             PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true)) 
+	{
+            
+            String cerere = in.readLine();
+            // ... faci logica (calculezi răspunsul) ...
+	    //in e input si out e output restul e cod normal efectiv
+            int codFacultatePrimit = Integer.parseInt(cerere);
+            out.println(codFacultatePrimit);
+            
+        } 
+        
+    } 
+});
+
+//SERVER MULTI-THREAD
+Thread serverThread = new Thread(() -> {
+    try (ServerSocket server = new ServerSocket(8080)) 
+    {
+        System.out.println("[SERVER] Astept clienti in paralel...");
+        
+        // Daca enuntul zice "exact 3 clienti", pui o variabila contor (int clienti = 0) 
+        // si faci while(clienti < 3). Daca zice "oricati", pui while(true).
+        int clientiServiti = 0; 
+        
+        while (clientiServiti < 3) {
+            
+            Socket clientSocket = server.accept(); 
+            
+            new Thread(() -> {
+                try (Socket socket = clientSocket;
+                     BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                     PrintWriter out = new PrintWriter(socket.getOutputStream(), true))
+		{
+                    
+                    String cerere = in.readLine();
+                    // ... faci logica ...
+		    int codFacultatePrimit = Integer.parseInt(cerere);
+                    out.println(codFacultatePrimit);
+                    
+                } 
+                
+            }).start(); // NU UITA SA PORNESTI THREAD-UL SECUNDAR CU .start()!
+            
+            clientiServiti++; 
+        } 
+    } 
+});
