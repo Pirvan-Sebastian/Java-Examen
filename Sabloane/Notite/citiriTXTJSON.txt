@@ -1,0 +1,41 @@
+
+//citire JSON Notebook -- mai bun
+
+List<Student> studenti = new ArrayList<>();
+
+    try (FileReader fisier = new FileReader("date/studenti.json")) 
+ {
+        
+        JSONTokener tokener = new JSONTokener(fisier);
+        JSONArray array = new JSONArray(tokener);
+
+        for (int i = 0; i < array.length(); i++) {
+            JSONObject obj = array.getJSONObject(i);
+            
+            studenti.add(new Student(
+                    obj.getInt("IdStudent"),
+                    obj.getString("Nume"),
+                    obj.getString("Prenume")
+            ));
+        }
+        
+    } 
+
+//citire TXT
+
+        List<Note> note = new ArrayList<>();
+        try(BufferedReader br = new BufferedReader(new FileReader("note.txt")))
+        {
+            String linie;
+
+            while((linie = br.readLine()) != null)
+            {
+                String[] parts = linie.split(",");
+
+                int idStudent = Integer.parseInt(parts[0].trim());
+                String materie = parts[1].trim();
+                double medie = Double.parseDouble(parts[2].trim());
+
+                note.add(new Note(idStudent, materie, medie));
+            }
+        }

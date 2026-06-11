@@ -1,0 +1,45 @@
+//Citire DB 
+List<Student> listaStudenti = new ArrayList<>();
+String url = "jdbc:sqlite:date/universitate.db";
+    
+    try (Connection connection = DriverManager.getConnection(url);
+         Statement statement = connection.createStatement();
+         ResultSet rezultat = comanda.executeQuery("SELECT * FROM Studenti")) 
+   {	
+        
+      while (rezultat.next()) 
+      {
+            // Extragem atributele de pe rândul curent, specificând poziția coloanei (1, 2, 3...)
+            long cnp = rezultat.getLong(1);
+            String nume = rezultat.getString(2);
+            double medie = rezultat.getDouble(3);
+            int codFacultate = rezultat.getInt(4);
+            
+            listaStudenti.add(new Student(cnp, nume, medie, codFacultate));
+        }
+    }
+    
+}
+
+//Afisare DB
+String url = "jdbc:sqlite:date/studenti.db";
+    
+    try (Connection connection = DriverManager.getConnection(url);
+         PreparedStatement statement = connection.prepareStatement(
+                 "INSERT INTO Studenti(Cod, Nume) VALUES (?, ?)")) 
+	{
+       
+        for (Student student : studenti) 
+	{
+            
+            // Înlocuim primul '?' cu codul studentului
+            statement.setInt(1, student.getCod());
+            
+            // Înlocuim al doilea '?' cu numele studentului
+            statement.setString(2, student.getNume());
+           
+            statement.executeUpdate(); 
+        }
+        
+        System.out.println("Scrierea în baza de date s-a terminat cu succes!");  
+    }

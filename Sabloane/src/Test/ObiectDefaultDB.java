@@ -1,52 +1,45 @@
-package DataBase;
+package Test;
 
-public class ObiectDefault implements Comparable<ObiectDefault>
+public class ObiectDefaultDB implements Comparable<ObiectDefaultDB>
 {
     public int cod;
     public String nume;
-    public double pret;
+    public long telefon;
 
-    public ObiectDefault(int cod, String nume, double pret)
+    public ObiectDefaultDB(int cod, String nume, long telefon)
     {
         this.cod = cod;
         this.nume = nume;
-        this.pret = pret;
+        this.telefon = telefon;
     }
 
     public int getCod() {
         return cod;
     }
-
     public void setCod(int cod) {
         this.cod = cod;
     }
-
     public String getNume() {
         return nume;
     }
-
     public void setNume(String nume) {
         this.nume = nume;
     }
-
-    public double getPret() {
-        return pret;
+    public long getTelefon() {
+        return telefon;
     }
-
-    public void setPret(double pret) {
-        this.pret = pret;
+    public void setTelefon(long telefon) {
+        this.telefon = telefon;
     }
-
     @Override
     public String toString() {
         return
                 "cod=" + cod +
                 ", nume='" + nume +
-                ", pret=" + pret;
+                ", telefon=" + telefon;
     }
-
     @Override
-    public int compareTo(ObiectDefault obiectDefault) {
-        return this.getCod() - obiectDefault.getCod();
+    public int compareTo(ObiectDefaultDB obiectDefaultDB) {
+        return this.getCod() - obiectDefaultDB.getCod();
     }
 }

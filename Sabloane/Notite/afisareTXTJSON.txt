@@ -1,0 +1,39 @@
+//afisare TXT
+        try(PrintWriter writer = new PrintWriter("./date/subiect1/lista.txt"))
+        {
+            writer.println("DenumireProdus,Pret");
+            for(Produs p : produse)
+            {
+                writer.printf("%s,%f",p.denumire,p.pret);
+                writer.println();
+            }
+            System.out.println("Fisier General cu Succes!");
+
+        }
+//afisare JSON
+
+    try (PrintWriter writer = new PrintWriter(new FileWriter("date/raport.json"))) 
+    {
+        //vector de elemente JSON
+        JSONArray arrayJson = new JSONArray();
+        
+        for (Produs produs : listaProduse) 
+        {
+            
+            // 4. Creăm un obiect JSON (reprezintă acoladele {})
+            JSONObject obiectJson = new JSONObject();
+            
+            // 5. Adăugăm atributele sub formă de "Cheie" : Valoare
+            obiectJson.put("cod_produs", produs.getCod());
+            obiectJson.put("denumire", produs.getDenumire());
+            obiectJson.put("pret", produs.getPret());
+            
+            // 6. Adăugăm obiectul în vectorul mare
+            arrayJson.put(obiectJson);
+        }
+        
+        // 7. Salvăm totul în fișierul text
+        writer.write(arrayJson.toString(4));
+        
+        System.out.println("Fisierul JSON a fost generat cu succes!");
+    }
